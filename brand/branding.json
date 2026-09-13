@@ -22,5 +22,8 @@
     "text": "El texto siempre acompaña la voz del guion: nunca se escribe contenido que el guion no diga.",
     "cta": "El CTA proviene únicamente del campo CTA del guion introducido por el usuario.",
     "strategy": "La estrategia creativa y de marketing la define el usuario. El motor nunca inventa oferta, público objetivo ni mensajes."
+  },
+  "transitions": {
+    "seconds": 0.3
   }
 }
