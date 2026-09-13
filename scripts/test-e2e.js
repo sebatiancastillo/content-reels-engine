@@ -82,8 +82,51 @@ async function main() {
   const ok = checkRules(dir);
   console.log(ok ? '   ✓ OK' : '   ✗ Falló la comprobación');
 
-  console.log('\nE2E FINALIZADO ' + (ok ? 'CON ÉXITO' : 'CON ERRORES'));
-  process.exit(ok ? 0 : 1);
+  console.log('== Seguridad: slug con path traversal rechazado =============');
+  const secOk = await securityChecks();
+  console.log(secOk ? '   ✓ Slug con "../" → HTTP 400 (y ruta normal sigue funcionando)' : '   ✗ La validación de slug falló');
+
+  console.log('\nE2E FINALIZADO ' + (ok && secOk ? 'CON ÉXITO' : 'CON ERRORES'));
+  process.exit(ok && secOk ? 0 : 1);
+}
+
+/**
+ * Levanta el servidor real (server.js) en un puerto efímero y comprueba
+ * que la validación de slug montada en /api/projects rechaza con 400 un
+ * segmento con path traversal ("../"), sin romper las rutas normales.
+ */
+async function securityChecks() {
+  const http = require('http');
+  const app = require('../server');
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise((resolve) => server.once('listening', resolve));
+  const port = server.address().port;
+
+  const call = (p) => new Promise((resolve) => {
+    const req = http.request({ host: '127.0.0.1', port, path: p, method: 'GET' }, (res) => {
+      let body = '';
+      res.on('data', (c) => (body += c));
+      res.on('end', () => resolve({ code: res.statusCode, body }));
+    });
+    req.on('error', () => resolve({ code: 0, body: 'client error' }));
+    req.end();
+  });
+
+  try {
+    const evil = await call('/api/projects/../etc/render/status');
+    if (evil.code !== 400) {
+      console.log(`   ✗ Se esperaba HTTP 400 para "../", se recibió ${evil.code}: ${String(evil.body).slice(0, 160)}`);
+      return false;
+    }
+    const normal = await call(`/api/projects/${SLUG}/render/status`);
+    if (normal.code !== 200) {
+      console.log(`   ✗ Una ruta normal con slug válido devolvió ${normal.code} (regresión del middleware)`);
+      return false;
+    }
+    return true;
+  } finally {
+    server.close();
+  }
 }
 
 /* ------------------------------------------------------------------ */

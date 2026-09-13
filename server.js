@@ -13,6 +13,7 @@ const ff = dieIfFFmpegMissing();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+const HOST = '127.0.0.1';
 
 app.disable('x-powered-by');
 app.use(express.json({ limit: '1mb' }));
@@ -24,10 +25,15 @@ app.use((req, res, next) => {
 // ---------------------------------------------------------------------
 // API interna
 // ---------------------------------------------------------------------
-app.use('/api/projects', require('./api/projects'));
-app.use('/api/projects', require('./api/material'));
-app.use('/api/projects', require('./api/script'));
-app.use('/api/projects', require('./api/render'));
+const validateSlug = require('./api/slugMiddleware');
+
+// validateSlug valida req.params.id (:id) antes de cada router: cierra
+// path traversal (DELETE /api/projects/:id usa fs.rmSync recursive) y
+// slugs malformados en cualquier ruta /api/projects/<slug>/...
+app.use('/api/projects', validateSlug, require('./api/projects'));
+app.use('/api/projects', validateSlug, require('./api/material'));
+app.use('/api/projects', validateSlug, require('./api/script'));
+app.use('/api/projects', validateSlug, require('./api/render'));
 
 // ---------------------------------------------------------------------
 // Frontend estático
@@ -47,14 +53,19 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: message, stack: process.env.NODE_ENV === 'development' ? err.stack : undefined });
 });
 
-app.listen(PORT, () => {
-  console.log('');
-  console.log('  ⚒️  CONTENT REELS ENGINE — Vikingos');
-  console.log('  ------------------------------------------');
-  console.log(`  FFmpeg:   ${ff.ffmpeg}`);
-  console.log(`  FFprobe:  ${ff.ffprobe}`);
-  console.log(`  Frontend: http://localhost:${PORT}`);
-  console.log(`  API:      http://localhost:${PORT}/api/projects`);
-  console.log('  ------------------------------------------');
-  console.log('');
-});
+if (require.main === module) {
+  app.listen(PORT, HOST, () => {
+    console.log('');
+    console.log('  ⚒️  CONTENT REELS ENGINE — Vikingos');
+    console.log('  ------------------------------------------');
+    console.log(`  FFmpeg:   ${ff.ffmpeg}`);
+    console.log(`  FFprobe:  ${ff.ffprobe}`);
+    console.log(`  Frontend: http://localhost:${PORT}`);
+    console.log(`  API:      http://localhost:${PORT}/api/projects`);
+    console.log(`  Bind:     127.0.0.1 (solo esta máquina)`);
+    console.log('  ------------------------------------------');
+    console.log('');
+  });
+}
+
+module.exports = app;

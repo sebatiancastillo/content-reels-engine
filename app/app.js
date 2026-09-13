@@ -130,9 +130,9 @@ async function loadProjects() {
       </div>
       <h3>${escapeHtml(p.name)}</h3>
       <div class="p-title">${escapeHtml(p.slug)}</div>
-      <div class="p-stats">${counts}${dur ? ` · ${dur}` : ''}</div>
+      <div class="p-stats">${escapeHtml(counts)}${dur ? ` · ${escapeHtml(dur)}` : ''}</div>
       <div class="p-foot">
-        <span class="p-status">${renderStatusLabel(p.render)}</span>
+        <span class="p-status">${escapeHtml(renderStatusLabel(p.render))}</span>
         <button class="icon-btn danger" data-del="${escapeHtml(p.slug)}" title="Eliminar proyecto">🗑</button>
       </div>`;
     tile.addEventListener('click', () => openProject(p.slug));
@@ -199,7 +199,7 @@ function renderClips() {
         : '<span class="clip-thumbph"></span>'}</span>
       <span class="clip-order">${i + 1}</span>
       <span class="clip-kind">${clip.kind === 'video' ? 'Video' : 'Foto'}</span>
-      ${sec ? `<span class="clip-section">${sec}</span>` : ''}
+      ${sec ? `<span class="clip-section">${escapeHtml(sec)}</span>` : ''}
       <span class="clip-name">${escapeHtml(clip.fileName)}</span>
       <button class="icon-btn" data-act="up" title="Subir">↑</button>
       <button class="icon-btn" data-act="down" title="Bajar">↓</button>
@@ -356,7 +356,7 @@ function renderGenerate() {
   for (const it of items) {
     const div = document.createElement('div');
     div.className = 'rs-item';
-    div.innerHTML = `<div class="k">${it.k}</div><div class="v">${it.v}</div>`;
+    div.innerHTML = `<div class="k">${escapeHtml(it.k)}</div><div class="v">${escapeHtml(it.v)}</div>`;
     summary.appendChild(div);
   }
   updateRenderUI(p.render);
@@ -516,7 +516,7 @@ function renderResult() {
     ['Plataforma', PLATFORMS[p.platform] || '—'],
     ['Estilo', STYLES[p.style] || '—'],
   ];
-  meta.innerHTML = rows.map(([k, val]) => `<tr><td>${k}</td><td>${val}</td></tr>`).join('');
+  meta.innerHTML = rows.map(([k, val]) => `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(val)}</td></tr>`).join('');
 }
 
 /* ------------------------------------------------------------------ */
