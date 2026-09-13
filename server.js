@@ -35,6 +35,9 @@ app.use('/api/projects', validateSlug, require('./api/material'));
 app.use('/api/projects', validateSlug, require('./api/script'));
 app.use('/api/projects', validateSlug, require('./api/render'));
 
+// Marca global (no lleva slug: aplica a todos los reels por igual)
+app.use('/api/brand', require('./api/brand'));
+
 // ---------------------------------------------------------------------
 // Frontend estático
 // ---------------------------------------------------------------------

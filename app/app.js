@@ -64,6 +64,7 @@ function goStep(step) {
   if (btn) btn.classList.add('active');
   if (step === 'result') renderResult();
   if (step === 'generate') renderGenerate();
+  if (step === 'brand') loadBrand();
   if (step === 'material') { renderClips(); renderAudio(); }
   if (step === 'script') fillScript();
   if (step === 'format') fillFormat();
@@ -269,6 +270,112 @@ async function uploadFiles(files) {
   } finally {
     box.classList.add('hidden');
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Marca (brand global)                                                */
+/* ------------------------------------------------------------------ */
+
+async function loadBrand() {
+  const data = await get('/api/brand');
+  state.brand = data;
+
+  // Logo preview
+  const logoImg = $('#brand-logo-prev');
+  const logoEmpty = $('#brand-logo-empty');
+  if (data.hasLogo) {
+    logoImg.src = `/brand/logo/logo.png?cb=${Date.now()}`;
+    logoImg.style.display = '';
+    logoEmpty.style.display = 'none';
+  } else {
+    logoImg.style.display = 'none';
+    logoEmpty.style.display = '';
+  }
+
+  // Colores
+  const c = data.colors || {};
+  setInputColor('brand-primary', 'brand-primary-hex', c.primary || '#C8A453');
+  setInputColor('brand-secondary', 'brand-secondary-hex', c.secondary || '#2B2118');
+  setInputColor('brand-accent', 'brand-accent-hex', c.accent || '#8C6A34');
+
+  // Transición
+  const t = data.transitions || {};
+  const sec = Number(t.seconds) || 0.3;
+  $('#brand-transition').value = sec;
+  $('#brand-transition-label').textContent = `${sec} s`;
+
+  // Fuentes
+  const fonts = (data.fonts || []).map((f) => escapeHtml(f)).join(', ');
+  $('#brand-font-current').textContent = fonts || 'Vikingos-Regular.ttf (default)';
+
+  // Música
+  renderMusicList(data.music || []);
+}
+
+function setInputColor(rangeId, hexId, val) {
+  const hex = /^#[0-9A-Fa-f]{6,8}$/.test(val) ? val : '#000000';
+  $(`#${rangeId}`).value = hex;
+  $(`#${hexId}`).value = hex;
+  $(`#${rangeId}`).addEventListener('input', () => { $(`#${hexId}`).value = $(`#${rangeId}`).value; });
+  $(`#${hexId}`).addEventListener('input', () => {
+    if (/^#[0-9A-Fa-f]{6,8}$/.test($(`#${hexId}`).value)) $(`#${rangeId}`).value = $(`#${hexId}`).value;
+  });
+}
+
+function renderMusicList(music) {
+  const ul = $('#brand-music-list');
+  ul.innerHTML = '';
+  $('#brand-music-empty').classList.toggle('hidden', music.length > 0);
+  for (const f of music) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span class="clip-kind">Audio</span>
+      <span class="clip-name">${escapeHtml(f)}</span>
+      <button class="icon-btn danger" title="Eliminar">✕</button>`;
+    li.querySelector('button').addEventListener('click', async () => {
+      if (!confirm(`¿Eliminar "${f}" de brand/music/?`)) return;
+      try {
+        const res = await api(`/api/brand/music/${encodeURIComponent(f)}`, { method: 'DELETE' });
+        renderMusicList(res.music || []);
+      } catch (err) { alert(err.message); }
+    });
+    ul.appendChild(li);
+  }
+}
+
+async function saveBrand() {
+  const body = {
+    colors: {
+      primary: $('#brand-primary-hex').value.trim(),
+      secondary: $('#brand-secondary-hex').value.trim(),
+      accent: $('#brand-accent-hex').value.trim(),
+    },
+    transitions: { seconds: parseFloat($('#brand-transition').value) || 0.3 },
+  };
+  try {
+    await postJSON('/api/brand', body);
+    const flag = $('#brand-saved');
+    flag.classList.remove('hidden');
+    setTimeout(() => flag.classList.add('hidden'), 2000);
+  } catch (err) { alert(err.message); }
+}
+
+function wireBrandUpload(inputId, btnId, uploadPath, onDone) {
+  const input = $(inputId);
+  const btn = $(btnId);
+  if (!btn || !input) return;
+  btn.addEventListener('click', () => input.click());
+  input.addEventListener('change', async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      await api(uploadPath, { method: 'POST', body: form });
+      if (onDone) await onDone();
+    } catch (err) { alert(err.message); }
+    input.value = '';
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -602,6 +709,18 @@ fileInput.addEventListener('change', () => { uploadFiles(fileInput.files); fileI
 ['dragenter', 'dragover'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('dragover'); }));
 ['dragleave', 'drop'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('dragover'); }));
 dz.addEventListener('drop', (e) => uploadFiles(e.dataTransfer.files));
+
+// Marca
+$('#btn-save-brand').addEventListener('click', saveBrand);
+$('#brand-transition').addEventListener('input', () => { $('#brand-transition-label').textContent = `${$('#brand-transition').value} s`; });
+wireBrandUpload('#brand-logo-input', '#btn-brand-logo', '/api/brand/logo', loadBrand);
+wireBrandUpload('#brand-font-input', '#btn-brand-font', '/api/brand/font', loadBrand);
+wireBrandUpload('#brand-music-input', '#btn-brand-music', '/api/brand/music', loadBrand);
+$('#btn-brand-font-default').addEventListener('click', async () => {
+  if (!confirm('¿Restaurar las fuentes Vikingos-Regular.ttf y Vikingos-Bold.ttf incluidas en el proyecto?')) return;
+  await postJSON('/api/brand', { font: 'default' });
+  await loadBrand();
+});
 
 // Guion
 $('#btn-save-script').addEventListener('click', saveScript);

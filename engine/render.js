@@ -17,6 +17,11 @@ const H = 1920;
 
 let fontsState = null;
 
+/** Invalida el cache de fuentes (llamado al reemplazar tipografía de marca). */
+function resetFonts() {
+  fontsState = null;
+}
+
 function ensureFonts() {
   if (fontsState) return fontsState;
   const branding = readJson(path.join(BRAND_DIR, 'branding.json'), { font: {} });
@@ -339,7 +344,7 @@ async function renderProject(slug, opts = {}) {
   const cfg = readJson(projectConfigFile(slug), {});
   const script = readJson(projectScriptFile(slug), {});
   const template = loadTemplate('reel-default');
-  const branding = readJson(path.join(BRAND_DIR, 'branding.json'), { colors: {} });
+  const branding = readJson(path.join(BRAND_DIR, 'branding.json'), { colors: {}, transitions: {} });
   const colors = branding.colors;
 
   // 1) análisis (orden + duraciones)
@@ -389,7 +394,7 @@ async function renderProject(slug, opts = {}) {
     logoFile,
     musicFile,
     total: totalDuration,
-    transitions: template.transitions,
+    transitions: { ...template.transitions, ...branding.transitions },
     musicVolume: template.audio.musicVolume,
     background: template.resolution?.padColor || '14100C',
   });
@@ -472,4 +477,5 @@ module.exports = {
   ensureLogo,
   pickMusic,
   wrapText,
+  resetFonts,
 };

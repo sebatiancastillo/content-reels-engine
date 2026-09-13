@@ -56,10 +56,11 @@
 
     <nav class="steps" id="steps">
       <button data-step="material" class="step">Material<span class="stepnum">1</span></button>
-      <button data-step="script" class="step">Guion<span class="stepnum">2</span></button>
-      <button data-step="format" class="step">Formato<span class="stepnum">3</span></button>
-      <button data-step="generate" class="step">Generar<span class="stepnum">4</span></button>
-      <button data-step="result" class="step">Resultado<span class="stepnum">5</span></button>
+      <button data-step="brand" class="step">Marca<span class="stepnum">2</span></button>
+      <button data-step="script" class="step">Guion<span class="stepnum">3</span></button>
+      <button data-step="format" class="step">Formato<span class="stepnum">4</span></button>
+      <button data-step="generate" class="step">Generar<span class="stepnum">5</span></button>
+      <button data-step="result" class="step">Resultado<span class="stepnum">6</span></button>
     </nav>
 
     <!-- ---- Paso 1 · Material ---- -->
@@ -97,11 +98,93 @@
         </div>
       </div>
       <div class="panel-footer">
-        <button class="btn primary next" data-step="script">Continuar → Guion</button>
+        <button class="btn primary next" data-step="brand">Continuar → Marca</button>
       </div>
     </div>
 
-    <!-- ---- Paso 2 · Guion ---- -->
+    <!-- ---- Paso 2 · Marca ---- -->
+    <div id="step-brand" class="step-panel">
+      <div class="card">
+        <h2>Marca</h2>
+        <p class="sub">
+          Configuración global del brand kit (no por proyecto): aplica a todos los reels.
+          Se guarda en <code>brand/branding.json</code>, <code>brand/logo/</code>,
+          <code>brand/fonts/</code> y <code>brand/music/</code>.
+        </p>
+
+        <div class="brand-rows">
+          <div class="brand-row">
+            <div>
+              <h3>Logo</h3>
+              <p class="sub">PNG con transparencia. Reemplaza <code>brand/logo/logo.png</code>.</p>
+              <div class="brand-logo-grid">
+                <div class="brand-logo-prev">
+                  <img id="brand-logo-prev" src="" alt="Logo actual" />
+                  <span id="brand-logo-empty">Sin logo cargado</span>
+                </div>
+                <div class="brand-actions">
+                  <button id="btn-brand-logo" class="btn">Subir/reemplazar logo</button>
+                  <input type="file" id="brand-logo-input" accept="image/png" hidden />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-row">
+            <h3>Colores</h3>
+            <p class="sub">Colores hex del brand kit (<code>branding.json → colors</code>).</p>
+            <div class="color-fields">
+              <label>Primario
+                <span class="color-input-row"><input type="color" id="brand-primary" /><input type="text" id="brand-primary-hex" maxlength="9" /></span>
+              </label>
+              <label>Secundario
+                <span class="color-input-row"><input type="color" id="brand-secondary" /><input type="text" id="brand-secondary-hex" maxlength="9" /></span>
+              </label>
+              <label>Acento
+                <span class="color-input-row"><input type="color" id="brand-accent" /><input type="text" id="brand-accent-hex" maxlength="9" /></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="brand-row">
+            <h3>Tipografía</h3>
+            <p class="sub">Fuente de títulos (.ttf/.otf). Reemplaza <code>Vikingos-Regular.ttf</code> y <code>Vikingos-Bold.ttf</code>.</p>
+            <div class="brand-actions">
+              <button id="btn-brand-font" class="btn">Subir/reemplazar tipografía</button>
+              <input type="file" id="brand-font-input" accept=".ttf,.otf" hidden />
+              <button id="btn-brand-font-default" class="btn ghost">Restaurar Vikingos-Regular.ttf</button>
+            </div>
+            <p class="sub monospace" id="brand-font-current"></p>
+          </div>
+
+          <div class="brand-row">
+            <h3>Música de fondo</h3>
+            <p class="sub">El motor usa el primer archivo de <code>brand/music/</code> como música de marca.</p>
+            <div class="brand-actions">
+              <button id="btn-brand-music" class="btn">Subir música</button>
+              <input type="file" id="brand-music-input" accept="audio/*" hidden />
+            </div>
+            <ul id="brand-music-list" class="clip-list brand-music-list"></ul>
+            <p id="brand-music-empty" class="empty-inline hidden">Sin música de marca todavía.</p>
+          </div>
+
+          <div class="brand-row">
+            <h3>Transición</h3>
+            <p class="sub">Duración del fundido entre cortes (segundos). Usada por <code>render.js</code>.</p>
+            <div class="row" style="align-items:center;">
+              <input type="range" id="brand-transition" min="0" max="2.0" step="0.1" value="0.3" class="grow" />
+              <span class="monospace" id="brand-transition-label">0.3 s</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-save-brand" class="btn primary">Guardar marca</button>
+        <span id="brand-saved" class="saved-flag hidden">✓ Guardado</span>
+      </div>
+      <div class="panel-footer">
+        <button class="btn primary next" data-step="script">Continuar → Guion</button>
+      </div>
+    </div>
     <div id="step-script" class="step-panel">
       <div class="card">
         <h2>Guion</h2>
