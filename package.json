@@ -1,0 +1,29 @@
+{
+  "name": "content-reels-engine",
+  "version": "0.1.0",
+  "description": "Motor local de creación semiautomática de Reels para la marca Vikingos (carpintería).",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test:render": "node scripts/test-e2e.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "ffmpeg",
+    "reels",
+    "vikingos",
+    "video",
+    "automatizacion"
+  ],
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "canvas": "^3.1.0",
+    "express": "^4.19.2",
+    "multer": "^2.3.0"
+  }
+}

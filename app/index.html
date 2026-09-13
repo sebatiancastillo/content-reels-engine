@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Reels Engine · Vikingos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============================================================ -->
+  <!-- PANTALLA 1 · Lista de proyectos                              -->
+  <!-- ============================================================ -->
+  <section id="view-projects" class="view">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">⚒️</span>
+        <div>
+          <h1>Content Reels Engine</h1>
+          <p class="sub">Motor de edición programática para Reels · Vikingos</p>
+        </div>
+      </div>
+      <button id="btn-new-project" class="btn primary">+ Crear proyecto</button>
+    </header>
+
+    <div id="new-project-form" class="card hidden">
+      <label for="new-name">Nombre del proyecto</label>
+      <div class="row">
+        <input id="new-name" type="text" placeholder="Ej: Reel de lanzamiento — Mesa de roble" autocomplete="off" />
+        <button id="btn-submit-project" class="btn primary">Crear</button>
+      </div>
+      <small id="new-hint">El nombre se convierte a slug (kebab-case, sin acentos) para la carpeta del proyecto.</small>
+    </div>
+
+    <div id="project-list" class="grid"></div>
+
+    <p id="empty-state" class="empty hidden">
+      Aún no hay proyectos. Crea el primero para cargar material y generar tu primer reels.
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PANTALLA 2 · Proyecto                                        -->
+  <!-- ============================================================ -->
+  <section id="view-project" class="view hidden">
+    <header class="topbar">
+      <div class="brand">
+        <button id="btn-back" class="btn ghost">← Proyectos</button>
+        <div>
+          <h1 id="project-title">Proyecto</h1>
+          <p class="sub monospace" id="project-slug"></p>
+        </div>
+      </div>
+      <span id="project-badge" class="badge"></span>
+    </header>
+
+    <nav class="steps" id="steps">
+      <button data-step="material" class="step">Material<span class="stepnum">1</span></button>
+      <button data-step="script" class="step">Guion<span class="stepnum">2</span></button>
+      <button data-step="format" class="step">Formato<span class="stepnum">3</span></button>
+      <button data-step="generate" class="step">Generar<span class="stepnum">4</span></button>
+      <button data-step="result" class="step">Resultado<span class="stepnum">5</span></button>
+    </nav>
+
+    <!-- ---- Paso 1 · Material ---- -->
+    <div id="step-material" class="step-panel">
+      <div class="card">
+        <h2>Material</h2>
+        <p class="sub">
+          Arrastra videos, fotos y audio. Nombra los clips con prefijo numérico
+          (<code>01_hook.mp4</code>, <code>02_proceso.jpg</code>…) para fijar la sección;
+          si no, se asignan en orden al guion.
+        </p>
+
+        <div id="dropzone" class="dropzone">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M12 16V4m0 0l-4 4m4-4l4 4" />
+            <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+          </svg>
+          <div>Arrastra archivos aquí o <span class="link fake-link" id="browse-link">elígelos</span></div>
+          <small>Videos (mp4/mov/webm) · Fotos (jpg/png/webp) · Audio (mp3/wav)</small>
+          <input type="file" id="file-input" multiple hidden />
+        </div>
+        <div id="upload-progress" class="upload-progress hidden"><span class="spinner"></span> Subiendo…</div>
+
+        <div class="two-col">
+          <div>
+            <h3>Clips en orden de edición</h3>
+            <ul id="clip-list" class="clip-list"></ul>
+            <p class="empty-inline hidden" id="clip-empty">Sin clips todavía.</p>
+          </div>
+          <div>
+            <h3>Audio</h3>
+            <ul id="audio-list" class="clip-list"></ul>
+            <p class="empty-inline hidden" id="audio-empty">Sin pistas de audio. Se usará la de <code>brand/music/</code> si existe.</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer">
+        <button class="btn primary next" data-step="script">Continuar → Guion</button>
+      </div>
+    </div>
+
+    <!-- ---- Paso 2 · Guion ---- -->
+    <div id="step-script" class="step-panel">
+      <div class="card">
+        <h2>Guion</h2>
+        <p class="sub">
+          El guion es la fuente de verdad. El motor nunca inventa estrategia, CTA ni oferta:
+          todo lo que aparezca en el reel sale de estos campos.
+        </p>
+        <div class="script-fields">
+          <label>Hook <small>— primera frase que capta atención</small>
+            <textarea name="hook" rows="2" data-field="hook" placeholder="Ej: Nadie te lo dice, pero tu mesa se está deformando…"></textarea>
+          </label>
+          <label>Dolor <small>— el problema del cliente</small>
+            <textarea name="dolor" rows="2" data-field="dolor" placeholder="Ej: Las mesas baratas se pandean a los 6 meses."></textarea>
+          </label>
+          <label>Problema <small>— concreta la causa</small>
+            <textarea name="problema" rows="2" data-field="problema" placeholder="Ej: Madera verde sin secado controlado."></textarea>
+          </label>
+          <label>Proceso <small>— cómo lo resolvemos</small>
+            <textarea name="proceso" rows="4" data-field="proceso" placeholder="Ej: En Vikingos secamos la madera 60 días antes de cortar…"></textarea>
+          </label>
+          <label>Resultado <small>— antes/después o transformación</small>
+            <textarea name="resultado" rows="2" data-field="resultado" placeholder="Ej: Una mesa que dura generaciones."></textarea>
+          </label>
+          <label>CTA <small>— llamada a la acción literal</small>
+            <textarea name="cta" rows="2" data-field="cta" placeholder="Ej: Escríbenos «MESA» y te pasamos catálogo."></textarea>
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            Duración objetivo (segundos)
+            <input type="number" id="target-duration" min="4" max="120" value="30" />
+          </label>
+          <label class="grow">
+            Observaciones para edición
+            <textarea id="observaciones" rows="2" placeholder="Opcional: indica tiros a usar, ritmo, énfasis…"></textarea>
+          </label>
+        </div>
+        <button id="btn-save-script" class="btn primary">Guardar guion</button>
+        <span id="script-saved" class="saved-flag hidden">✓ Guardado</span>
+      </div>
+      <div class="panel-footer">
+        <button class="btn primary next" data-step="format">Continuar → Formato</button>
+      </div>
+    </div>
+
+    <!-- ---- Paso 3 · Formato ---- -->
+    <div id="step-format" class="step-panel">
+      <div class="card">
+        <h2>Formato y estilo</h2>
+        <p class="sub">Plataforma, formato vertical y estilo visual. El estilo cambia el aspecto del texto y el ritmo.</p>
+
+        <fieldset>
+          <legend>Plataforma</legend>
+          <div class="option-cards">
+            <label class="opt">
+              <input type="radio" name="platform" value="instagram" checked />
+              <div class="opt-body"><strong>Instagram</strong><small>Reels · 9:16 vertical</small></div>
+            </label>
+            <label class="opt">
+              <input type="radio" name="platform" value="tiktok" />
+              <div class="opt-body"><strong>TikTok</strong><small>9:16 vertical</small></div>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Formato</legend>
+          <div class="option-cards">
+            <label class="opt locked">
+              <input type="radio" name="format" value="9:16" checked disabled />
+              <div class="opt-body"><strong>Vertical 9:16</strong><small>1080 × 1920 · 30 fps (fijo en esta versión)</small></div>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Estilo</legend>
+          <div class="option-cards three">
+            <label class="opt">
+              <input type="radio" name="style" value="limpio" />
+              <div class="opt-body"><strong>Limpio</strong><small>Texto sobrio, caja translúcida sutil, acento fino.</small></div>
+            </label>
+            <label class="opt">
+              <input type="radio" name="style" value="dinamico" checked />
+              <div class="opt-body"><strong>Dinámico</strong><small>Texto grande en mayúsculas, acento dorado grueso.</small></div>
+            </label>
+            <label class="opt">
+              <input type="radio" name="style" value="profesional" />
+              <div class="opt-body"><strong>Profesional</strong><small>Marco dorado, tipografía con espaciado, contraste alto.</small></div>
+            </label>
+          </div>
+        </fieldset>
+
+        <button id="btn-save-config" class="btn primary">Guardar formato y estilo</button>
+        <span id="config-saved" class="saved-flag hidden">✓ Guardado</span>
+      </div>
+      <div class="panel-footer">
+        <button class="btn primary next" data-step="generate">Continuar → Generar</button>
+      </div>
+    </div>
+
+    <!-- ---- Paso 4 · Generar ---- -->
+    <div id="step-generate" class="step-panel">
+      <div class="card">
+        <h2>Generar reel</h2>
+        <div id="render-summary" class="render-summary"></div>
+
+        <button id="btn-render" class="btn primary big">⚡ Generar reel</button>
+        <p id="render-gate" class="gate hidden"></p>
+
+        <div id="render-progress-wrap" class="hidden">
+          <div class="progressbar"><div id="render-progress-fill" class="progressfill"></div></div>
+          <p id="render-progress-label" class="monospace">0%</p>
+          <p id="render-message" class="sub"></p>
+          <div class="row render-tools">
+            <button id="btn-cancel" class="btn danger hidden">❚❚ Cancelar render</button>
+          </div>
+          <div id="render-log" class="render-log monospace"></div>
+        </div>
+
+        <div id="render-error" class="error-box hidden">
+          <h3>El render falló</h3>
+          <p id="error-message"></p>
+          <pre id="error-stderr" class="monospace"></pre>
+          <div id="error-validation" class="monospace"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- Paso 5 · Resultado ---- -->
+    <div id="step-result" class="step-panel">
+      <div class="card">
+        <h2>Resultado</h2>
+        <div class="result-layout">
+          <div class="video-frame">
+            <video id="result-video" controls playsinline poster=""></video>
+          </div>
+          <div>
+            <table class="meta" id="result-meta"></table>
+            <div class="actions">
+              <button id="btn-edit" class="btn ghost">Editar</button>
+              <button id="btn-regen" class="btn primary">Regenerar</button>
+              <button id="btn-finish" class="btn primary gold">Hecho · guardado</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>

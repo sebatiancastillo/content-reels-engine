@@ -1,0 +1,26 @@
+{
+  "brand": "Vikingos",
+  "slogan": "Carpintería artesanal con ADN de artesano",
+  "tagline": "Madera que cuenta historias",
+  "colors": {
+    "primary": "#C8A453",
+    "secondary": "#2B2118",
+    "background": "#14100C",
+    "text": "#F5EFE4",
+    "accent": "#8C6A34"
+  },
+  "font": {
+    "regular": "Vikingos-Regular.ttf",
+    "bold": "Vikingos-Bold.ttf"
+  },
+  "logo": {
+    "file": "brand/logo/logo.png",
+    "position": "top-right"
+  },
+  "music": "brand/music/",
+  "rules": {
+    "text": "El texto siempre acompaña la voz del guion: nunca se escribe contenido que el guion no diga.",
+    "cta": "El CTA proviene únicamente del campo CTA del guion introducido por el usuario.",
+    "strategy": "La estrategia creativa y de marketing la define el usuario. El motor nunca inventa oferta, público objetivo ni mensajes."
+  }
+}

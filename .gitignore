@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+
+# Proyectos generados localmente
+projects/*
+!projects/.gitkeep
+
+# Artefactos temporales de render
+temp/
+output/
+*.mp4
+*.log
+
+# Assets de marca no versionados (material real, fuentes licenciadas, música)
+brand/logo/*.png
+brand/music/*.mp3
+brand/music/*.wav
+brand/fonts/*.ttf
+brand/fonts/*.otf
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.swp
+.env

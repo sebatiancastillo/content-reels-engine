@@ -1,0 +1,25 @@
+{
+  "name": "reel-default",
+  "version": "1",
+  "description": "Plantilla base de edición para reels 9:16. Las duraciones se tratan como pesos relativos: analyze.js las re-escala para ajustarse a la duración objetivo del guion.",
+  "resolution": { "width": 1080, "height": 1920, "fps": 30, "pixelFormat": "yuv420p" },
+  "targetDuration": 30,
+  "sections": [
+    { "id": "hook", "label": "Hook", "field": "hook", "min": 2, "weight": 3 },
+    { "id": "dolor", "label": "Dolor", "field": "dolor", "min": 2, "weight": 3 },
+    { "id": "problema", "label": "Problema", "field": "problema", "min": 2, "weight": 3 },
+    { "id": "proceso", "label": "Proceso", "field": "proceso", "min": 3, "weight": 10 },
+    { "id": "resultado", "label": "Resultado", "field": "resultado", "min": 3, "weight": 6 },
+    { "id": "cta", "label": "CTA", "field": "cta", "min": 3, "weight": 5 }
+  ],
+  "clipNaming": "prefix-number",
+  "transitions": { "type": "fade", "seconds": 0.3, "audioDuck": 0.3 },
+  "text": {
+    "fontSizeLimite": 3,
+    "position": "center",
+    "boxOpacity": 0.42,
+    "paddingX": 60
+  },
+  "audio": { "musicVolume": 0.22, "mix": "duck", "fadeOut": 1.5 },
+  "logo": { "position": "top-right", "scale": 0.14, "opacity": 0.9 }
+}
